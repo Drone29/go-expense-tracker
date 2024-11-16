@@ -15,15 +15,15 @@ type cmdType struct {
 
 type Flag struct {
 	Name  string
-	Value any
+	Value any // default value
 	Help  string
 }
 
 func (cmd *cmdType) invoke() {
 	// Create arguments to pass to the function
 	args := make([]reflect.Value, len(cmd.flags))
-
-	cmd.flagSet.Visit(func(f *flag.Flag) {
+	// Visit all flags (even those not set) and populate slice with parsed values
+	cmd.flagSet.VisitAll(func(f *flag.Flag) {
 		if v, ok := f.Value.(flag.Getter); ok {
 			if i, ok := cmd.flags[f.Name]; ok {
 				args[i] = reflect.ValueOf(v.Get())
@@ -39,6 +39,7 @@ func (cmd *cmdType) invoke() {
 var commands = map[string]cmdType{}
 
 // register a new command. action should be a function of any signature
+// flags' order and values must correspond to the function's signature
 func AddCmd(cmd string, action any, flags []Flag) {
 	actVal := reflect.ValueOf(action)
 	if actVal.Kind() != reflect.Func {
@@ -70,15 +71,26 @@ func AddCmd(cmd string, action any, flags []Flag) {
 	}
 }
 
+func showHelp() {
+	fmt.Printf("Usage: %s <CMD>\n", os.Args[0])
+	fmt.Printf("List of CMDs:\n")
+	for k, v := range commands {
+		fmt.Printf("%s\n", k)
+		v.flagSet.SetOutput(os.Stdout)
+		v.flagSet.PrintDefaults()
+	}
+}
+
 func Parse() {
 
 	if len(os.Args) > 1 {
 		name := os.Args[1]
 		cmd, ok := commands[name]
 		if ok {
-			err := cmd.flagSet.Parse(os.Args[2:])
+			args := os.Args[2:]
+			err := cmd.flagSet.Parse(args)
 			if err != nil {
-				fmt.Printf("Error parsing %v\n", os.Args[2:])
+				fmt.Printf("Error parsing %v\n", args)
 				os.Exit(1)
 			}
 
@@ -87,8 +99,11 @@ func Parse() {
 
 		} else {
 			fmt.Println("Unknown command", name)
+			showHelp()
 			os.Exit(1)
 		}
+	} else {
+		showHelp()
 	}
 
 }

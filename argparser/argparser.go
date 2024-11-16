@@ -75,7 +75,7 @@ func showHelp() {
 	fmt.Printf("Usage: %s <CMD>\n", os.Args[0])
 	fmt.Printf("List of CMDs:\n")
 	for k, v := range commands {
-		fmt.Printf("%s\n", k)
+		fmt.Println(k)
 		v.flagSet.SetOutput(os.Stdout)
 		v.flagSet.PrintDefaults()
 	}

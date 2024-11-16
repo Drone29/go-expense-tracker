@@ -13,8 +13,8 @@ func Add(description string, amount int) {
 
 func main() {
 	argparser.AddCmd("add", Add, []Flag{
-		{Name: "description", Value: ""},
-		{Name: "amount", Value: 0},
+		{Name: "description", Value: "", Help: "expense description"},
+		{Name: "amount", Value: 0, Help: "expense amount"},
 	})
 
 	argparser.Parse()

@@ -3,6 +3,8 @@ package main
 import (
 	"expense-tracker/argparser"
 	"expense-tracker/expense"
+	"fmt"
+	"time"
 )
 
 type Flag = argparser.Flag
@@ -28,6 +30,9 @@ func main() {
 	})
 	argparser.AddCmd("summary", expense.Summary, []Flag{
 		{Name: "month", Value: -1, Help: "optional, show summary only for selected month"},
+	})
+	argparser.AddCmd("export-csv", expense.WriteToCSVFile, []Flag{
+		{Name: "filename", Value: fmt.Sprintf("expenses-%d.csv", time.Now().Year())},
 	})
 
 	argparser.Parse()

@@ -56,7 +56,9 @@ func List(month int) {
 		keys = append(keys, k)
 	}
 	sort.Ints(keys)
-	fmt.Printf("%-10s %-12s %-20s %-10s\n", "ID", "Date", "Description", "Amount")
+	// ID Date Descr Amount
+	fmt.Printf("%-10s %-12s %-20s %-10s\n",
+		expense_header[0], expense_header[3], expense_header[1], expense_header[2])
 	for _, k := range keys {
 		v := expense_map[k]
 		print_expense := func() {

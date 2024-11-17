@@ -114,9 +114,11 @@ func Summary(month int) {
 	var month_filter time.Month
 	for _, v := range expense_map {
 		if month > 0 && month < 13 {
-			if v.Date.Year() == time.Now().Year() && int(v.Date.Month()) == month {
+			month_filter = time.Month(month)
+			mon := int(v.Date.Month())
+			yr := time.Now().Year()
+			if v.Date.Year() == yr && mon == month {
 				summary += v.Amount
-				month_filter = time.Month(month)
 			}
 		} else {
 			summary += v.Amount

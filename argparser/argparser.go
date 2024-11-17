@@ -28,7 +28,8 @@ func (cmd *cmdType) invoke() {
 			if i, ok := cmd.flags[f.Name]; ok {
 				args[i] = reflect.ValueOf(v.Get())
 			} else {
-				panic(fmt.Sprintf("Key was not parsed %s", f.Name))
+				fmt.Printf("Key was not parsed %s\n", f.Name)
+				return
 			}
 		}
 	})
@@ -43,7 +44,8 @@ var commands = map[string]cmdType{}
 func AddCmd(cmd string, action any, flags []Flag) {
 	actVal := reflect.ValueOf(action)
 	if actVal.Kind() != reflect.Func {
-		panic(fmt.Sprintf("AddCmd: action must be a function, got %T", action))
+		fmt.Printf("AddCmd: action must be a function, got %T\n", action)
+		return
 	}
 
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
@@ -58,7 +60,8 @@ func AddCmd(cmd string, action any, flags []Flag) {
 		case int:
 			fs.Int(flag.Name, flagVal, flag.Help)
 		default:
-			panic(fmt.Sprintf("Unsupported type %T", flagVal))
+			fmt.Printf("Unsupported type %T\n", flagVal)
+			return
 		}
 		flagMap[flag.Name] = i
 		i++

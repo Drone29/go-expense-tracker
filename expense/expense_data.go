@@ -14,7 +14,7 @@ type Expense struct {
 	ID          ExpenseID     `json:"id"`
 	Description string        `json:"description"`
 	Amount      ExpenseAmount `json:"amount"`
-	Date        ExpenseTime   `json:"created-at"`
+	Date        ExpenseTime   `json:"date"`
 }
 
 // Convert to json string

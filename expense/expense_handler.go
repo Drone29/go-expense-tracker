@@ -3,6 +3,7 @@ package expense
 import (
 	"fmt"
 	"log"
+	"sort"
 	"time"
 )
 
@@ -83,11 +84,18 @@ func Delete(id int) {
 
 // list expenses
 func List(month int) {
-	fmt.Println("ID        Date        Description        Amount")
-	for k, v := range expense_map {
+	// sort by keys
+	keys := make([]ExpenseID, 0, len(expense_map))
+	for k := range expense_map {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	fmt.Printf("%-10s %-12s %-20s %-10s\n", "ID", "Date", "Description", "Amount")
+	for _, k := range keys {
+		v := expense_map[k]
 		print_expense := func() {
-			fmt.Printf("%v        %s        %s        %v\n",
-				k, v.Date.Format("2000-12-30"), v.Description, v.Amount)
+			fmt.Printf("%-10v %-12s %-20s %-10v\n",
+				k, v.Date.Format("2006-01-02"), v.Description, v.Amount)
 		}
 		if month > 0 && month < 13 {
 			// filter by month (current year)

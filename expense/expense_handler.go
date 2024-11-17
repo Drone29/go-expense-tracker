@@ -115,9 +115,7 @@ func Summary(month int) {
 	for _, v := range expense_map {
 		if month > 0 && month < 13 {
 			month_filter = time.Month(month)
-			mon := int(v.Date.Month())
-			yr := time.Now().Year()
-			if v.Date.Year() == yr && mon == month {
+			if v.Date.Year() == time.Now().Year() && v.Date.Month() == month_filter {
 				summary += v.Amount
 			}
 		} else {

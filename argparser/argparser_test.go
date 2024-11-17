@@ -14,8 +14,8 @@ func TestParserNoDefault(t *testing.T) {
 		{Name: "str", Value: ""},
 	})
 	os.Args = []string{os.Args[0], "test", "--str", "abcd"}
-	Parse()
-	if test_str != "abcd" {
+	res := Parse()
+	if res != 0 || test_str != "abcd" {
 		t.Error("Invalid parse")
 	}
 }
@@ -29,8 +29,8 @@ func TestParserDefault(t *testing.T) {
 		{Name: "str", Value: "default string"},
 	})
 	os.Args = []string{os.Args[0], "test"}
-	Parse()
-	if test_str != "default string" {
+	res := Parse()
+	if res != 0 || test_str != "default string" {
 		t.Error("Invalid parse")
 	}
 }
@@ -48,8 +48,22 @@ func TestParserOrder(t *testing.T) {
 	})
 	// should parse params and pass them into function no matter in what order they're supplied
 	os.Args = []string{os.Args[0], "test", "--int", "456", "--str", "abcd"}
-	Parse()
-	if test_str != "abcd" || test_int != 456 {
+	res := Parse()
+	if res != 0 || test_str != "abcd" || test_int != 456 {
 		t.Error("Invalid parse")
+	}
+}
+
+func TestInvalid(t *testing.T) {
+	test_f := func(val string, val2 int) {}
+	AddCmd("test", test_f, []Flag{
+		{Name: "str", Value: ""},
+		{Name: "int", Value: 0},
+	})
+	// invalid args (omitted --int)
+	os.Args = []string{os.Args[0], "test", "456", "--str", "abcd"}
+	res := Parse()
+	if res == 0 {
+		t.Error("Should've returned error")
 	}
 }

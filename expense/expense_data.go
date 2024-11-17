@@ -8,12 +8,13 @@ import (
 
 type ExpenseID = int
 type ExpenseTime = time.Time
+type ExpenseAmount = int
 
 type Expense struct {
-	ID          ExpenseID   `json:"id"`
-	Description string      `json:"description"`
-	Amount      int         `json:"amount"`
-	Date        ExpenseTime `json:"created-at"`
+	ID          ExpenseID     `json:"id"`
+	Description string        `json:"description"`
+	Amount      ExpenseAmount `json:"amount"`
+	Date        ExpenseTime   `json:"created-at"`
 }
 
 // Convert to json string

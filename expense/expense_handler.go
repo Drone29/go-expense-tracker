@@ -83,14 +83,42 @@ func Delete(id int) {
 
 // list expenses
 func List(month int) {
-	if month > 0 && month < 13 {
-
+	fmt.Println("ID        Date        Description        Amount")
+	for k, v := range expense_map {
+		print_expense := func() {
+			fmt.Printf("%v        %s        %s        %v\n",
+				k, v.Date.Format("2000-12-30"), v.Description, v.Amount)
+		}
+		if month > 0 && month < 13 {
+			// filter by month (current year)
+			if v.Date.Year() == time.Now().Year() && int(v.Date.Month()) == month {
+				print_expense()
+			}
+		} else {
+			print_expense()
+		}
 	}
 }
 
 // get expenses summary
 func Summary(month int) {
-	if month > 0 && month < 13 {
-
+	var summary ExpenseAmount
+	var month_filter time.Month
+	for _, v := range expense_map {
+		if month > 0 && month < 13 {
+			if v.Date.Year() == time.Now().Year() && int(v.Date.Month()) == month {
+				summary += v.Amount
+				month_filter = time.Month(month)
+			}
+		} else {
+			summary += v.Amount
+		}
 	}
+
+	if month_filter > 0 {
+		fmt.Printf("Summary for %s %d: %v\n", month_filter.String(), time.Now().Year(), summary)
+	} else {
+		fmt.Printf("Summary for %d: %v\n", time.Now().Year(), summary)
+	}
+
 }

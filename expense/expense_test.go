@@ -26,10 +26,10 @@ func TestStringify(t *testing.T) {
 }
 
 func TestWriteRead(t *testing.T) {
-	if err := WriteToJsonFile("test.json", []Expense{sample_task}); err != nil {
+	if err := writeToJsonFile("test.json", []Expense{sample_task}); err != nil {
 		t.Errorf("Error writing to file %v", sample_task)
 	}
-	new_tasks, err := ReadJsonFile("test.json")
+	new_tasks, err := readJsonFile("test.json")
 	if err != nil {
 		t.Errorf("Error reading from file %v", err)
 	}

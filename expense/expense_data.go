@@ -34,9 +34,36 @@ func find_expense(id int) (*Expense, int) {
 	return &exp, id
 }
 
+// Write to json file
+func writeToJsonFile(filename string, tasks []Expense) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	encoder := json.NewEncoder(f)
+	encoder.SetIndent("", "    ")
+	return encoder.Encode(tasks)
+}
+
+// Read tasks array from file
+func readJsonFile(filename string) (tasks []Expense, err error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	js_bytes, err := os.ReadFile(filename)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(js_bytes, &tasks)
+	return
+}
+
 // load expenses from file
 func LoadExpenses() {
-	tasks, _ := ReadJsonFile(expense_json_file)
+	tasks, _ := readJsonFile(expense_json_file)
 	for _, tsk := range tasks {
 		expense_map[tsk.ID] = tsk
 		last_id = max(last_id, tsk.ID)
@@ -49,38 +76,11 @@ func SaveExpenses() {
 	for _, tsk := range expense_map {
 		tasks = append(tasks, tsk)
 	}
-	WriteToJsonFile(expense_json_file, tasks)
+	writeToJsonFile(expense_json_file, tasks)
 }
 
 // Convert to json string
 func StringifyToJson(tasks []Expense) (string, error) {
 	js_bytes, err := json.MarshalIndent(tasks, "", "    ")
 	return string(js_bytes), err
-}
-
-// Writeto json file
-func WriteToJsonFile(filename string, tasks []Expense) error {
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	encoder := json.NewEncoder(f)
-	encoder.SetIndent("", "    ")
-	return encoder.Encode(tasks)
-}
-
-// Read tasks array from file
-func ReadJsonFile(filename string) (tasks []Expense, err error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-	js_bytes, err := os.ReadFile(filename)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(js_bytes, &tasks)
-	return
 }

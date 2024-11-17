@@ -1,7 +1,6 @@
 package expense
 
 import (
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,12 +10,14 @@ import (
 type ExpenseID = int
 type ExpenseTime = time.Time
 type ExpenseAmount = int
+type ExpenseCategory = string
 
 type Expense struct {
-	ID          ExpenseID     `json:"id"`
-	Description string        `json:"description"`
-	Amount      ExpenseAmount `json:"amount"`
-	Date        ExpenseTime   `json:"date"`
+	ID          ExpenseID       `json:"id"`
+	Description string          `json:"description"`
+	Amount      ExpenseAmount   `json:"amount"`
+	Date        ExpenseTime     `json:"date"`
+	Category    ExpenseCategory `json:"category,omitempty"`
 }
 
 func (e *Expense) toCSV() []string {
@@ -25,6 +26,7 @@ func (e *Expense) toCSV() []string {
 		e.Description,               // Descr
 		fmt.Sprintf("%v", e.Amount), // Amount
 		e.Date.Format("2006-01-02"), // Date
+		e.Category,
 	}
 }
 
@@ -32,7 +34,7 @@ var (
 	expense_map    = map[ExpenseID]Expense{}
 	last_id        ExpenseID
 	expense_header = []string{
-		"ID", "Description", "Amount", "Date",
+		"ID", "Description", "Amount", "Date", "Category",
 	}
 )
 
@@ -72,31 +74,6 @@ func readJsonFile(filename string) (expenses []Expense, err error) {
 	}
 	err = json.Unmarshal(js_bytes, &expenses)
 	return
-}
-
-// Write to csv file
-func WriteToCSVFile(filename string) {
-	f, err := os.Create(filename)
-	if err != nil {
-		fmt.Printf("Error creating file %s: %v", filename, err)
-		return
-	}
-	defer f.Close()
-	writer := csv.NewWriter(f)
-	defer writer.Flush()
-	// Write header
-	err = writer.Write(expense_header)
-	if err != nil {
-		fmt.Printf("Error writing to file %s: %v", filename, err)
-		return
-	}
-	for _, e := range expense_map {
-		err = writer.Write(e.toCSV())
-		if err != nil {
-			fmt.Printf("Error writing to file %s: %v", filename, err)
-			return
-		}
-	}
 }
 
 // load expenses from file

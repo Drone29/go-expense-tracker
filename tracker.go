@@ -37,6 +37,8 @@ func main() {
 	})
 	argparser.AddCmd("export-csv", expense.ExportToCSVFile, []Flag{
 		{Name: "filename", Value: fmt.Sprintf("expenses-%d.csv", time.Now().Year())},
+		{Name: "month", Value: -1, Help: "optional, list only selected month"},
+		{Name: "category", Value: "", Help: "optional, expense category"},
 	})
 
 	argparser.Parse()

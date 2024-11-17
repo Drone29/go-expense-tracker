@@ -55,9 +55,9 @@ func Delete(id int) {
 	fmt.Printf("Expense deleted successfully (ID: %d)\n", id)
 }
 
-func check_condition(v Expense, month int, category ExpenseCategory) bool {
-	month_filter := month > 0 && month < 13 && int(v.Date.Month()) == month
-	category_filter := category != "" && v.Category == category
+func check_condition(e Expense, month int, category ExpenseCategory) bool {
+	month_filter := month > 0 && month < 13 && int(e.Date.Month()) == month
+	category_filter := category != "" && e.Category == category
 	return (month <= 0 || month_filter) && (category == "" || category_filter)
 }
 
@@ -72,8 +72,8 @@ func sort_by_id() []ExpenseID {
 
 // list expenses
 func List(month int, category ExpenseCategory) {
-	// sort by keys
-	keys := sort_by_id()
+	// sort by ids
+	ids := sort_by_id()
 	fmt.Printf("%-10s %-12s %-20s %-10s %-20s\n",
 		expense_header[0], // ID
 		expense_header[3], // Date
@@ -82,7 +82,7 @@ func List(month int, category ExpenseCategory) {
 		expense_header[4], // Category
 	)
 
-	for _, k := range keys {
+	for _, k := range ids {
 		v := expense_map[k]
 		print_expense := func() {
 			fmt.Printf("%-10v %-12s %-20s %-10v %-20s\n",
@@ -110,7 +110,7 @@ func Summary(month int, category ExpenseCategory) {
 }
 
 // Write to csv file
-func ExportToCSVFile(filename string) {
+func ExportToCSVFile(filename string, month int, category ExpenseCategory) {
 	f, err := os.Create(filename)
 	if err != nil {
 		fmt.Printf("Error creating file %s: %v", filename, err)
@@ -125,12 +125,21 @@ func ExportToCSVFile(filename string) {
 		fmt.Printf("Error writing to file %s: %v", filename, err)
 		return
 	}
-	for _, e := range expense_map {
-		err = writer.Write(e.toCSV())
-		if err != nil {
-			fmt.Printf("Error writing to file %s: %v", filename, err)
-			return
+	// sort by ids
+	ids := sort_by_id()
+	for _, id := range ids {
+		e := expense_map[id]
+		if check_condition(e, month, category) {
+			err = writer.Write(e.toCSV())
+			if err != nil {
+				fmt.Printf("Error writing to file %s: %v", filename, err)
+				return
+			}
 		}
 	}
-	fmt.Printf("Exported successfully to %s\n", filename)
+	var month_str string
+	if month > 0 && month < 13 {
+		month_str = time.Month(month).String()
+	}
+	fmt.Printf("Exported expenses %s %d %s successfully to %s\n", month_str, time.Now().Year(), category, filename)
 }

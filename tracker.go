@@ -2,49 +2,35 @@ package main
 
 import (
 	"expense-tracker/argparser"
+	"expense-tracker/expense"
 )
 
 type Flag = argparser.Flag
 
-func Add(description string, amount int) {
-
-}
-
-func Update(id int, description string, amount int) {
-
-}
-
-func Delete(id int) {
-
-}
-
-func List(month int) {
-
-}
-
-func Summary(month int) {
-
-}
-
 func main() {
-	argparser.AddCmd("add", Add, []Flag{
+
+	expense.LoadExpenses()
+
+	argparser.AddCmd("add", expense.Add, []Flag{
 		{Name: "description", Value: "", Help: "expense description"},
 		{Name: "amount", Value: -1, Help: "expense amount"},
 	})
-	argparser.AddCmd("update", Update, []Flag{
+	argparser.AddCmd("update", expense.Update, []Flag{
 		{Name: "id", Value: -1, Help: "expense id"},
 		{Name: "description", Value: "", Help: "expense description"},
 		{Name: "amount", Value: -1, Help: "expense amount"},
 	})
-	argparser.AddCmd("delete", Delete, []Flag{
+	argparser.AddCmd("delete", expense.Delete, []Flag{
 		{Name: "id", Value: -1, Help: "expense id"},
 	})
-	argparser.AddCmd("list", List, []Flag{
+	argparser.AddCmd("list", expense.List, []Flag{
 		{Name: "month", Value: -1, Help: "optional, list only selected month"},
 	})
-	argparser.AddCmd("summary", Summary, []Flag{
-		{Name: "month", Value: -1, Help: "optional, show summaru only for selected month"},
+	argparser.AddCmd("summary", expense.Summary, []Flag{
+		{Name: "month", Value: -1, Help: "optional, show summary only for selected month"},
 	})
 
 	argparser.Parse()
+
+	expense.SaveExpenses()
 }

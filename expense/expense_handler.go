@@ -87,8 +87,8 @@ func check_if_exceeds_budget(amount ExpenseAmount) bool {
 			amount = get_summary(int(mon), "")
 		}
 		if amount > budget.Amount {
-			fmt.Printf("Monthly expenses exceed monthly budget! Expenses for %s %v, budget %v",
-				stringify_current_month(), amount, budget)
+			fmt.Printf("Monthly expenses exceed monthly budget! Expenses for %s %v, budget %v\n",
+				stringify_current_month(), amount, budget.Amount)
 			return true
 		}
 	}
@@ -187,7 +187,7 @@ func Summary(month int, category ExpenseCategory) {
 func ExportToCSVFile(filename string, month int, category ExpenseCategory) {
 	f, err := os.Create(filename)
 	if err != nil {
-		fmt.Printf("Error creating file %s: %v", filename, err)
+		fmt.Printf("Error creating file %s: %v\n", filename, err)
 		return
 	}
 	defer f.Close()
@@ -196,7 +196,7 @@ func ExportToCSVFile(filename string, month int, category ExpenseCategory) {
 	// Write header
 	err = writer.Write(expense_header)
 	if err != nil {
-		fmt.Printf("Error writing to file %s: %v", filename, err)
+		fmt.Printf("Error writing to file %s: %v\n", filename, err)
 		return
 	}
 	// sort by ids
@@ -206,7 +206,7 @@ func ExportToCSVFile(filename string, month int, category ExpenseCategory) {
 		if e.filter(month, category) {
 			err = writer.Write(e.toCSV())
 			if err != nil {
-				fmt.Printf("Error writing to file %s: %v", filename, err)
+				fmt.Printf("Error writing to file %s: %v\n", filename, err)
 				return
 			}
 		}
@@ -252,15 +252,15 @@ func SetMonthlyBudget(budget ExpenseAmount) {
 
 	check_if_exceeds_budget(-1)
 
-	fmt.Printf("Successfully set monthly budget to %v", budget)
+	fmt.Printf("Successfully set monthly budget to %v\n", budget)
 }
 
 func ShowMonthlyBudget() {
 	budget, ok := expense_map[budget_id]
 	if ok && budget.Date.Month() == current_date().Month() {
-		fmt.Printf("Budget for %s is %v",
+		fmt.Printf("Budget for %s is %v\n",
 			stringify_current_month(), budget.Amount)
 	} else {
-		fmt.Printf("Budget for %s is not set", stringify_current_month())
+		fmt.Printf("Budget for %s is not set\n", stringify_current_month())
 	}
 }

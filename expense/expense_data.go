@@ -36,9 +36,8 @@ var (
 	expense_header = []string{
 		"ID", "Description", "Amount", "Date", "Category",
 	}
+	expense_json_file = "expenses.json"
 )
-
-const expense_json_file = "expenses.json"
 
 func find_expense(id int) (*Expense, int) {
 	exp, ok := expense_map[id]
@@ -92,10 +91,4 @@ func SaveExpenses() {
 		tasks = append(tasks, tsk)
 	}
 	writeToJsonFile(expense_json_file, tasks)
-}
-
-// Convert to json string
-func StringifyToJson(tasks []Expense) (string, error) {
-	js_bytes, err := json.MarshalIndent(tasks, "", "    ")
-	return string(js_bytes), err
 }

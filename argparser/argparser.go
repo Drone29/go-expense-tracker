@@ -19,6 +19,10 @@ type Flag struct {
 	Help  string
 }
 
+var commands = map[string]cmdType{}
+
+// cmdType methods
+
 func (cmd *cmdType) invoke() {
 	// Create arguments to pass to the function
 	args := make([]reflect.Value, len(cmd.flags))
@@ -37,7 +41,19 @@ func (cmd *cmdType) invoke() {
 	cmd.action.Call(args)
 }
 
-var commands = map[string]cmdType{}
+// helpers
+
+func showHelp() {
+	fmt.Printf("Usage: %s <CMD>\n", os.Args[0])
+	fmt.Printf("List of CMDs:\n")
+	for k, v := range commands {
+		fmt.Println(k)
+		v.flagSet.SetOutput(os.Stdout)
+		v.flagSet.PrintDefaults()
+	}
+}
+
+// functions
 
 // register a new command. action should be a function of any signature
 // flags' order and values must correspond to the function's signature
@@ -71,16 +87,6 @@ func AddCmd(cmd string, action any, flags []Flag) {
 		action:  actVal,
 		flagSet: fs,
 		flags:   flagMap,
-	}
-}
-
-func showHelp() {
-	fmt.Printf("Usage: %s <CMD>\n", os.Args[0])
-	fmt.Printf("List of CMDs:\n")
-	for k, v := range commands {
-		fmt.Println(k)
-		v.flagSet.SetOutput(os.Stdout)
-		v.flagSet.PrintDefaults()
 	}
 }
 

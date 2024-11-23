@@ -11,6 +11,7 @@ type cmdType struct {
 	action  reflect.Value
 	flagSet *flag.FlagSet
 	flags   map[string]int // holds flags' keys and corresponding index
+	help    string
 }
 
 type Flag struct {
@@ -19,7 +20,7 @@ type Flag struct {
 	Help  string
 }
 
-var commands = map[string]cmdType{}
+var commands = map[string]*cmdType{}
 
 // cmdType methods
 
@@ -41,13 +42,17 @@ func (cmd *cmdType) invoke() {
 	cmd.action.Call(args)
 }
 
+func (cmd *cmdType) SetHelp(help string) {
+	cmd.help = help
+}
+
 // helpers
 
 func showHelp() {
 	fmt.Printf("Usage: %s <CMD>\n", os.Args[0])
 	fmt.Printf("List of CMDs:\n")
 	for k, v := range commands {
-		fmt.Println(k)
+		fmt.Printf("%s : %s\n", k, v.help)
 		v.flagSet.SetOutput(os.Stdout)
 		v.flagSet.PrintDefaults()
 	}
@@ -57,11 +62,10 @@ func showHelp() {
 
 // register a new command. action should be a function of any signature
 // flags' order and values must correspond to the function's signature
-func AddCmd(cmd string, action any, flags []Flag) {
+func AddCmd(cmd string, action any, flags []Flag) *cmdType {
 	actVal := reflect.ValueOf(action)
 	if actVal.Kind() != reflect.Func {
-		fmt.Printf("AddCmd: action must be a function, got %T\n", action)
-		return
+		panic(fmt.Sprintf("AddCmd: action must be a function, got %T\n", action))
 	}
 
 	fs := flag.NewFlagSet(cmd, flag.ExitOnError)
@@ -80,18 +84,19 @@ func AddCmd(cmd string, action any, flags []Flag) {
 		case float64:
 			fs.Float64(flag.Name, flagVal, flag.Help)
 		default:
-			fmt.Printf("Unsupported type %T\n", flagVal)
-			return
+			panic(fmt.Sprintf("Unsupported type %T\n", flagVal))
 		}
 		flagMap[flag.Name] = i
 		i++
 	}
 
-	commands[cmd] = cmdType{
+	commands[cmd] = &cmdType{
 		action:  actVal,
 		flagSet: fs,
 		flags:   flagMap,
 	}
+
+	return commands[cmd]
 }
 
 func Parse() int {

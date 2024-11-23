@@ -20,7 +20,7 @@ func Add(description string, amount ExpenseAmount, category ExpenseCategory) {
 		ID:          last_id,
 		Description: description,
 		Amount:      amount,
-		Date:        time.Now(),
+		Date:        current_date(),
 		Category:    category,
 	}
 	fmt.Printf("Expense added successfully (ID: %d)\n", last_id)
@@ -55,12 +55,6 @@ func Delete(id int) {
 	fmt.Printf("Expense deleted successfully (ID: %d)\n", id)
 }
 
-func check_condition(e Expense, month int, category ExpenseCategory) bool {
-	month_filter := month > 0 && month < 13 && int(e.Date.Month()) == month
-	category_filter := category != "" && e.Category == category
-	return (month <= 0 || month_filter) && (category == "" || category_filter)
-}
-
 func sort_by_id() []ExpenseID {
 	ids := make([]ExpenseID, 0, len(expense_map))
 	for k := range expense_map {
@@ -88,7 +82,7 @@ func List(month int, category ExpenseCategory) {
 			fmt.Printf("%-10v %-12s %-20s %-10v %-20s\n",
 				k, v.Date.Format("2006-01-02"), v.Description, v.Amount, v.Category)
 		}
-		if check_condition(v, month, category) {
+		if v.filter(month, category) {
 			print_expense()
 		}
 	}
@@ -98,7 +92,7 @@ func List(month int, category ExpenseCategory) {
 func Summary(month int, category ExpenseCategory) {
 	var summary ExpenseAmount
 	for _, v := range expense_map {
-		if check_condition(v, month, category) {
+		if v.filter(month, category) {
 			summary += v.Amount
 		}
 	}
@@ -109,7 +103,7 @@ func Summary(month int, category ExpenseCategory) {
 	fmt.Printf("Total expenses for %s %d %s: %v\n", month_str, time.Now().Year(), category, summary)
 }
 
-// Write to csv file
+// write to csv file
 func ExportToCSVFile(filename string, month int, category ExpenseCategory) {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -129,7 +123,7 @@ func ExportToCSVFile(filename string, month int, category ExpenseCategory) {
 	ids := sort_by_id()
 	for _, id := range ids {
 		e := expense_map[id]
-		if check_condition(e, month, category) {
+		if e.filter(month, category) {
 			err = writer.Write(e.toCSV())
 			if err != nil {
 				fmt.Printf("Error writing to file %s: %v", filename, err)
@@ -142,4 +136,9 @@ func ExportToCSVFile(filename string, month int, category ExpenseCategory) {
 		month_str = time.Month(month).String()
 	}
 	fmt.Printf("Exported expenses %s %d %s successfully to %s\n", month_str, time.Now().Year(), category, filename)
+}
+
+// set monthly budget
+func SetMonthlyBudget(amount ExpenseAmount) {
+
 }

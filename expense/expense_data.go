@@ -7,6 +7,9 @@ import (
 	"time"
 )
 
+// special id for budget object
+const budget_id ExpenseID = 0
+
 type ExpenseID = int
 type ExpenseTime = time.Time
 type ExpenseAmount = int
@@ -20,6 +23,16 @@ type Expense struct {
 	Category    ExpenseCategory `json:"category,omitempty"`
 }
 
+var (
+	expense_map    = map[ExpenseID]Expense{}
+	last_id        ExpenseID
+	expense_header = []string{
+		"ID", "Description", "Amount", "Date", "Category",
+	}
+	expense_json_file = "expenses.json"
+)
+
+// Expense methods
 func (e *Expense) toCSV() []string {
 	return []string{
 		fmt.Sprintf("%v", e.ID),     // ID
@@ -30,18 +43,24 @@ func (e *Expense) toCSV() []string {
 	}
 }
 
-var (
-	expense_map    = map[ExpenseID]Expense{}
-	last_id        ExpenseID
-	expense_header = []string{
-		"ID", "Description", "Amount", "Date", "Category",
-	}
-	expense_json_file = "expenses.json"
-)
+func (e *Expense) filter(month int, category ExpenseCategory) bool {
+	month_filter := month > 0 && month < 13 && int(e.Date.Month()) == month
+	category_filter := category != "" && e.Category == category
+	id_cond := e.ID != budget_id
+	mon_cond := month <= 0 || month_filter
+	cat_cond := category == "" || category_filter
+	return id_cond && mon_cond && cat_cond
+}
+
+// helpers
+
+func current_date() ExpenseTime {
+	return time.Now()
+}
 
 func find_expense(id int) (*Expense, int) {
 	exp, ok := expense_map[id]
-	if !ok {
+	if !ok || id == budget_id {
 		fmt.Println("No task with id", id)
 		return nil, -1
 	}
@@ -75,6 +94,7 @@ func readJsonFile(filename string) (expenses []Expense, err error) {
 	return
 }
 
+// functions
 // load expenses from file
 func LoadExpenses() {
 	tasks, _ := readJsonFile(expense_json_file)

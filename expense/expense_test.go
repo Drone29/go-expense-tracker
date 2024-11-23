@@ -5,14 +5,13 @@ import (
 	"testing"
 )
 
-var sample_task = Expense{
-	ID:          12,
-	Description: "Test",
-	Amount:      23,
-	Category:    "test",
-}
-
 func TestWriteRead(t *testing.T) {
+	var sample_task = Expense{
+		ID:          12,
+		Description: "Test",
+		Amount:      23,
+		Category:    "test",
+	}
 	if err := writeToJsonFile("test.json", []Expense{sample_task}); err != nil {
 		t.Errorf("Error writing to file %v", sample_task)
 	}
@@ -58,5 +57,53 @@ func TestDeleteExpense(t *testing.T) {
 	Delete(last_id)
 	if len(expense_map) != old_len {
 		t.Errorf("Error deleting expense, len=%v", len(expense_map))
+	}
+}
+
+func TestExpenseFilter(t *testing.T) {
+	e := Expense{
+		ID:       1,
+		Date:     current_date(),
+		Category: "test",
+	}
+
+	if ok := e.filter(int(current_date().Month()), "test"); !ok {
+		t.Error("Should be valid!")
+	}
+	if ok := e.filter(int(current_date().Month()), ""); !ok {
+		t.Error("Should be valid!")
+	}
+	if ok := e.filter(0, "test"); !ok {
+		t.Error("Should be valid!")
+	}
+	if ok := e.filter(int(current_date().Month()), "tttt"); ok {
+		t.Error("Should be invalid!")
+	}
+	next_month := int(current_date().Month()+1)%12 + 1
+	if ok := e.filter(next_month, "test"); ok {
+		t.Errorf("Should not have found month %v!", next_month)
+	}
+	e.ID = budget_id
+	if ok := e.filter(int(current_date().Month()), "test"); ok {
+		t.Error("Should be invalid!")
+	}
+}
+
+func TestFindExpense(t *testing.T) {
+	expense_map[budget_id] = Expense{
+		ID:       budget_id,
+		Date:     current_date(),
+		Category: "test",
+	}
+	expense_map[100] = Expense{
+		ID:       100,
+		Date:     current_date(),
+		Category: "test",
+	}
+	if exp, _ := find_expense(budget_id); exp != nil {
+		t.Errorf("Budget object should not be found")
+	}
+	if exp, _ := find_expense(100); exp == nil {
+		t.Errorf("Should've found existing non-budget object")
 	}
 }

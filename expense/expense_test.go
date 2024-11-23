@@ -27,15 +27,15 @@ func TestWriteRead(t *testing.T) {
 
 func TestAddExpense(t *testing.T) {
 	for i := 1; i < 11; i++ {
-		Add("test", i, "test")
+		Add("test", ExpenseAmount(i), "test")
 	}
 
-	sum := 0
+	sum := ExpenseAmount(0)
 	for _, v := range expense_map {
 		sum += v.Amount
 	}
 
-	if sum != 55 {
+	if sum != ExpenseAmount(55) {
 		t.Errorf("Invalid sum! %v", sum)
 	}
 }

@@ -100,7 +100,7 @@ func check_if_exceeds_budget(amount ExpenseAmount) bool {
 // add new expense
 func Add(description string, amount ExpenseAmount, category ExpenseCategory) {
 	if amount <= 0 {
-		log.Fatalf("Invalid amount %d", amount)
+		log.Fatalf("Invalid amount %v", amount)
 	}
 
 	last_id++
@@ -240,7 +240,7 @@ func SaveExpenses() {
 // set monthly budget
 func SetMonthlyBudget(budget ExpenseAmount) {
 	if budget <= 0 {
-		log.Fatalf("Invalid amount %d", budget)
+		log.Fatalf("Invalid amount %v", budget)
 	}
 	expense_map[budget_id] = Expense{
 		ID:          budget_id,

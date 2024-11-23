@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-// special id for budget object
-const budget_id ExpenseID = 0
+const budget_id ExpenseID = 0     // special id for budget object
+const DefAmt ExpenseAmount = -1.0 // default amount
 
 type ExpenseID = int
 type ExpenseTime = time.Time
-type ExpenseAmount = int
+type ExpenseAmount = float64
 type ExpenseCategory = string
 
 type Expense struct {

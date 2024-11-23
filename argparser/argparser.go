@@ -75,6 +75,10 @@ func AddCmd(cmd string, action any, flags []Flag) {
 			fs.Bool(flag.Name, flagVal, flag.Help)
 		case int:
 			fs.Int(flag.Name, flagVal, flag.Help)
+		case float32:
+			fs.Float64(flag.Name, float64(flagVal), flag.Help)
+		case float64:
+			fs.Float64(flag.Name, flagVal, flag.Help)
 		default:
 			fmt.Printf("Unsupported type %T\n", flagVal)
 			return

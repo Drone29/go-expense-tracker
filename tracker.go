@@ -40,6 +40,10 @@ func main() {
 		{Name: "month", Value: -1, Help: "optional, list only selected month"},
 		{Name: "category", Value: "", Help: "optional, expense category"},
 	})
+	argparser.AddCmd("set-budget", expense.SetMonthlyBudget, []Flag{
+		{Name: "amount", Value: -1, Help: "monthly budget amount"},
+	})
+	argparser.AddCmd("show-budget", expense.ShowMonthlyBudget, []Flag{})
 
 	argparser.Parse()
 
